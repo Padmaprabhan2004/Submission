@@ -1,0 +1,20 @@
+<launch>
+    <arg name="model" default="$(find volta_description)/urdf/volta.xacro"/>
+    <include file="$(find gazebo_ros)/launch/empty_world.launch" />
+    <param name="robot_description" command="$(find xacro)/xacro --inorder $(arg model)"/>
+    
+
+        <param name="robot_description" command="$(find xacro)/xacro --inorder $(arg model)"/>
+        <node name="bot_1_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" >
+            <param name="tf_prefix" value="bot_1"/>
+        </node>
+
+        <node name="bot_1_spawn_urdf" pkg="gazebo_ros" type="spawn_model" args="-urdf -model bots  -param robot_description" />
+
+
+        <node name="bot_2_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" >
+            <param name="tf_prefix" value="bot_2" />
+        </node>
+
+
+</launch>

@@ -1,0 +1,99 @@
+<?xml version="1.0"?>
+
+
+<robot name="volta_robot" xmlns:xacro="https://ros.org/wiki/xacro">
+
+
+    <!-- xacro includes -->
+    <xacro:include filename="$(find volta_description)/urdf/volta_properties.xacro"/>
+    <xacro:include filename="$(find volta_description)/urdf/components/wheel_volta.urdf.xacro"/>
+    <xacro:include filename="$(find volta_description)/urdf/components/caster_volta.urdf.xacro"/>
+
+    <!-- xacro properties -->
+    <xacro:property name="PI" value="3.14159"/>
+
+    <!-- xacro args -->
+    <xacro:arg name="robot_namespace" default="/" />
+    <xacro:arg name="tf_pre" default=""/>
+    <xacro:arg name="lidar_enabled" default="true"/>
+    <xacro:arg name="rplidar_a3_enabled" default="true"/>
+    <xacro:arg name="hokuyo_ust_10lx_enabled" default="false"/>
+    <xacro:arg name="imu_enabled" default="true"/>
+    <xacro:arg name="camera_enabled" default="true"/>
+    <xacro:arg name="intel_d435i_enabled" default="true"/>
+    <xacro:arg name="orbbec_astra_pro_enabled" default="false"/>
+
+
+
+    <xacro:macro name="volta_robot" params="x y yaw joint_prefix">
+
+        <!-- Footprint -->
+        <link name="${joint_prefix}/footprint"/>
+
+        <!-- Joint from footprint to base link(chassis) -->
+        <joint name="${joint_prefix}/base_footprint_joint" type="fixed">
+            <origin xyz="${x} ${y} ${base_underside_h+0.05}" rpy="0 0 ${yaw}" />
+            <parent link="${joint_prefix}/base_link"/>
+            <child link="${joint_prefix}/footprint"/>
+        </joint>
+
+        <!-- Chassis a.k.a base_link -->
+        <link name="${joint_prefix}/base_link">
+            <visual name="visual_base">
+                <origin xyz="0 0 0" rpy="0 0 0" />
+                <geometry>
+                    <mesh filename="package://volta_description/meshes/opt4.dae"/>
+                </geometry>
+            </visual>
+
+            <collision>
+                <origin xyz="0 0 0" rpy="0 0 0" />
+                <geometry>
+                    <mesh filename="package://volta_description/meshes/opt4.dae"/>
+                </geometry>
+            </collision>
+            <inertial>
+		            <origin xyz ="0.00701 0.0000 0.08382"/>
+                <mass value="${base_mass}"/>
+                <inertia ixx="${base_ixx}" ixy="${base_ixy}" ixz="${base_ixz}" iyy="${base_iyy}" iyz="${base_iyz}" izz="${base_izz}"/>
+            </inertial>
+        </link>
+
+        <!-- Wheel -->
+        <xacro:volta_wheel wheel_prefix="${joint_prefix}/right">
+            <origin xyz="0.0 ${-wheel_joint_y_abs+0.005} ${wheel_joint_z_abs}" rpy="0 0 0" />
+        </xacro:volta_wheel>
+
+        <xacro:volta_wheel wheel_prefix="${joint_prefix}/left">
+            <origin xyz="0.0 ${wheel_joint_y_abs-0.005} ${wheel_joint_z_abs}" rpy="0 0 0" />
+        </xacro:volta_wheel>
+
+        <!-- Caster wheels -->
+        <xacro:volta_caster caster_prefix="${joint_prefix}/front_left">
+            <origin xyz="${caster_joint_x} ${caster_joint_y} ${caster_joint_z}" rpy="0 0 0" />
+        </xacro:volta_caster>
+
+        <xacro:volta_caster caster_prefix="${joint_prefix}/front_right">
+            <origin xyz="${caster_joint_x} ${-caster_joint_y} ${caster_joint_z}" rpy="0 0 0" />
+        </xacro:volta_caster>
+
+        <xacro:volta_caster caster_prefix="${joint_prefix}/rear_right">
+            <origin xyz="${-caster_joint_x} ${-caster_joint_y} ${caster_joint_z}" rpy="0 0 0" />
+        </xacro:volta_caster>
+
+        <xacro:volta_caster caster_prefix="${joint_prefix}/rear_left">
+            <origin xyz="${-caster_joint_x} ${caster_joint_y} ${caster_joint_z}" rpy="0 0 0" />
+        </xacro:volta_caster>
+
+        <!-- Robot Gazebo tag -->
+        <gazebo>
+            <plugin name="gazebo_ros_control" filename="libgazebo_ros_control.so">
+                <robotNamespace>$(arg robot_namespace)</robotNamespace>
+                <robotSimType>gazebo_ros_control/DefaultRobotHWSim</robotSimType>
+            </plugin>
+        </gazebo>
+        
+
+    </xacro:macro>
+
+</robot>

@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<launch>
+    <arg name="model" default="$(find volta_description)/urdf/volta.xacro"/>
+
+    <!-- Launch an empty Gazebo world -->
+    <include file="$(find gazebo_ros)/launch/empty_world.launch" />
+
+    <param name="robot_description" command="$(find xacro)/xacro --inorder $(arg model)"/>
+
+    <node pkg="robot_state_publisher" type="robot_state_publisher" name="robot_state_publisher">
+      <param name="publish_frequency" type="double" value="100.0" />
+    </node>
+    <!-- Spawn the URDF model in the empty Gazebo world -->
+    <node name="spawn_urdf" pkg="gazebo_ros" type="spawn_model" args="-urdf -model bots -param robot_description" />
+
+
+    <node pkg="robot_state_publisher2" type="robot_state_publisher" name="robot_state_publisher2">
+      <param name="publish_frequency" type="double" value="100.0" />
+    </node>
+    
+</launch>

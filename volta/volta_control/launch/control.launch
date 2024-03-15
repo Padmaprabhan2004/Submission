@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<launch>
+    <arg name="bot_name" default="bot_x"/>
+	<rosparam command="load" file="$(find volta_control)/config/$(arg bot_name).yaml" >
+    </rosparam>
+
+	<node name="$(arg bot_name)_base_controller_spawner" pkg="controller_manager" type="spawner"
+        args="$(arg bot_name)_joint_publisher $(arg bot_name)_base_controller">
+    </node>
+
+    <node name="$(arg bot_name)_relay_odom" pkg="topic_tools" type="relay" output="screen" args="$(arg bot_name)_base_controller/odom $(arg bot_name)/odom" />
+    <node name="$(arg bot_name)_relay_cmd_vel" pkg="topic_tools" type="relay" output="screen" args="$(arg bot_name)/cmd_vel $(arg bot_name)_base_controller/cmd_vel" />
+    <node name="$(arg bot_name)_relay_imu" pkg="topic_tools" type="relay" output="screen" args="$(arg bot_name)/imu/data $(arg bot_name)_base_controller/imu/data" />
+
+</launch>
